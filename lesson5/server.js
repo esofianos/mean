@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var api = express.Router();
 var router = express.Router();
 var productController = require('./controllers/products');
 var bodyParser = require('body-parser');
@@ -7,18 +8,28 @@ var mongoose = require('mongoose');
 
 mongoose.connect("mongodb://localhost:27017/products");
 
+app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
-app.use("/api", router);
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
 
-router.route("/products").get(productController.getProducts);
-router.route("/product/:productId").get(productController.getProduct);
-router.route("/addProduct").post(productController.addProduct);
-router.route("/updateProduct/:productId").post(productController.updateProduct);
-router.route("/deleteProduct/:productId").get(productController.deleteProduct);
+app.use("/", router);
+router.route("/products").get(productController.renderProducts);
+router.route("/products").post(productController.saveAndRenderProduct);
+router.route("/product/:productId").get(productController.renderProduct);
+router.route("/products/new").get(productController.renderNewProduct);
+
+app.use("/api", api);
+
+api.route("/products").get(productController.getProducts);
+api.route("/product/:productId").get(productController.getProduct);
+api.route("/addProduct").post(productController.addProduct);
+api.route("/updateProduct/:productId").put(productController.updateProduct);
+api.route("/deleteProduct/:productId").get(productController.deleteProduct);
 
 var server = app.listen(3000, function () {
 	

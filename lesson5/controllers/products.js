@@ -1,19 +1,72 @@
 var Product = require('../models/products');
 
-exports.getProducts = function (req, res) {
+function _getProducts(next, res) {
 	Product.find({}, function (err, products) {
-		res.json(products);
-	})
+		next(err, res, products);
+	});
+}
+
+function _sendJSON (err, res, val) {
+	if (err) {
+		res.send(err);
+	} else {
+		res.json(val);
+	}
+}
+
+exports.getProducts = function (req, res) {
+	_getProducts(_sendJSON, res);
 };
 
+function _renderProducts(err, res, products) {
+	if (err) {
+		res.send(err);
+	} else {
+		res.render('products/index', {products: products});
+	}
+}
+
+exports.renderProducts = function (req, res) {
+	_getProducts(_renderProducts, res);
+}
+
+function _getProduct(next, id, res) {
+	Product.find({_id: id}, function (err, products) {
+		next(err, res, products);
+	})
+}
+
 exports.getProduct = function (req, res) {
-	Product.find({_id:req.params.productId}, function (err, product) {
+	_getProduct(_sendJSON, req.params.productId, res);
+};
+
+
+function _renderProduct(err, res, products) {
+	if (err) {
+		res.send(err);
+	} else {
+		res.render('products/show', {product: products[0]});
+	}
+}
+
+exports.renderProduct = function (req, res) {
+	_getProduct(_renderProduct, req.params.productId, res);
+}
+
+exports.renderNewProduct = function (req, res) {
+	res.render("products/new", {product: new Product()});
+}
+
+exports.saveAndRenderProduct = function (req, res) {
+	var product = new Product(req.body.product);
+	product.save(function (err) {
 		if (err) {
 			res.send(err);
+		} else {
+			res.redirect("/product/" + product._id.toHexString());
 		};
-		res.json(product);
 	})
-};
+}
 
 exports.addProduct = function (req, res) {
 	var product = new Product();
