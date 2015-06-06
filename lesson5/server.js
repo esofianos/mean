@@ -1,10 +1,15 @@
 var express = require('express');
-
 var app = express();
+var router = express.Router();
+var productController = require('./controllers/products');
 
-app.get('/', function (req, res) {
-	res.send("Hello World!");
-});
+app.use("/api", router);
+
+router.route("/products").get(productController.getProducts);
+router.route("/product").get(productController.getProduct);
+router.route("/addProduct").post(productController.addProduct);
+router.route("/updateProduct").post(productController.updateProduct);
+router.route("/deleteProduct").get(productController.deleteProduct);
 
 var server = app.listen(3000, function () {
 	
