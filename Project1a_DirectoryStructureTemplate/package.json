@@ -1,0 +1,15 @@
+{
+  "name": "Project1a_DirectoryStructureTemplate",
+  "version": "1.0.0",
+  "description": "an example of structure",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Eva Sofianos",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.13.1"
+  }
+}
